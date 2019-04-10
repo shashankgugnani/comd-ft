@@ -1,5 +1,5 @@
 /*
- * checkpoints.h
+ * checkpoint.h
  *
  *  Modified on: Mar 14, 2019
  *       Author: Shashank Gugnani
@@ -9,8 +9,8 @@
  *      Author: Ignacio Laguna
  *     Contact: ilaguna@llnl.gov
  */
-#ifndef SRC_MPI_CHECKPOINTS_H_
-#define SRC_MPI_CHECKPOINTS_H_
+#ifndef SRC_MPI_CHECKPOINT_H_
+#define SRC_MPI_CHECKPOINT_H_
 
 #include "CoMDTypes.h"
 
@@ -20,4 +20,4 @@ void writeCheckpoint(SimFlat *sim);
 void loadCheckpoint(SimFlat *sim);
 
 
-#endif /* SRC_MPI_CHECKPOINTS_H_ */
+#endif /* SRC_MPI_CHECKPOINT_H_ */

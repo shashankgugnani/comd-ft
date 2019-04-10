@@ -1,5 +1,5 @@
 /*
- * checkpoints.c
+ * checkpoint.c
  *
  *  Modified on: Mar 14, 2019
  *       Author: Shashank Gugnani
