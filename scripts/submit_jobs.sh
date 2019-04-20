@@ -31,42 +31,22 @@ TOTAL_NODE_CNT=$(( $COMPUTE_NODE_CNT + $STORAGE_NODE_CNT ))
 sbatch                                                         \
     -N $TOTAL_NODE_CNT                                         \
     -p system-runs                                             \
-    -C "[skylake*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
+    -C "[sky-gpu*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
     run_comd_nvme_cr.sh $STORAGE_NODE_CNT weak
 sbatch                                                         \
     -N $TOTAL_NODE_CNT                                         \
     -p system-runs                                             \
-    -C "[skylake*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
+    -C "[sky-gpu*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
     run_comd_nvme_cr.sh $STORAGE_NODE_CNT strong
 
 # POSIX runs
-sbatch                                     \
-    -N $COMPUTE_NODE_CNT                   \
-    -p system-runs                         \
-    -C "bdw-ssd*$COMPUTE_NODE_CNT"         \
-    run_comd_posix.sh ssd weak
-sbatch                                     \
-    -N $COMPUTE_NODE_CNT                   \
-    -p system-runs                         \
-    -C "bdw-ssd*$COMPUTE_NODE_CNT"         \
-    run_comd_posix.sh ssd strong
-sbatch                                     \
-    -N $COMPUTE_NODE_CNT                   \
-    -p system-runs                         \
-    -C "bdw-gpu*$COMPUTE_NODE_CNT"         \
-    run_comd_posix.sh lustre weak
-sbatch                                     \
-    -N $COMPUTE_NODE_CNT                   \
-    -p system-runs                         \
-    -C "bdw-gpu*$COMPUTE_NODE_CNT"         \
-    run_comd_posix.sh lustre strong
-sbatch                                     \
-    -N $COMPUTE_NODE_CNT                   \
-    -p system-runs                         \
-    -C "bdw-gpu*$COMPUTE_NODE_CNT"         \
-    run_comd_posix.sh ramdisk weak
-sbatch                                     \
-    -N $COMPUTE_NODE_CNT                   \
-    -p system-runs                         \
-    -C "bdw-gpu*$COMPUTE_NODE_CNT"         \
-    run_comd_posix.sh ramdisk strong
+sbatch                                                         \
+    -N $COMPUTE_NODE_CNT                                       \
+    -p system-runs                                             \
+    -C "bdw-gpu*$COMPUTE_NODE_CNT"                             \
+    run_comd_posix.sh weak
+sbatch                                                         \
+    -N $COMPUTE_NODE_CNT                                       \
+    -p system-runs                                             \
+    -C "bdw-gpu*$COMPUTE_NODE_CNT"                             \
+    run_comd_posix.sh strong
