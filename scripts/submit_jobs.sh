@@ -1,7 +1,7 @@
 #!/bin/bash
 ### Submit jobs to test CoMD checkpoint/restart performance
-### with NVMe-CR and POSIX backends on RI2.
-### Usage: ./submit_jobs COMPUTE_NODE_CNT STORAGE_NODE_CNT
+### with NVMe-CR and POSIX backends on OSU RI2.
+### Usage: ./submit_jobs.sh COMPUTE_NODE_CNT STORAGE_NODE_CNT
 
 ####################
 ### Experiment Setup
