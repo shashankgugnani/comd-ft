@@ -35,23 +35,23 @@ TOTAL_NODE_CNT=$(( $COMPUTE_NODE_CNT + $STORAGE_NODE_CNT ))
 # NVMe-CR runs
 sbatch                                                         \
     -N $TOTAL_NODE_CNT                                         \
-    -p $PARTITION                                             \
+    -p $PARTITION                                              \
     -C "[sky-gpu*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
     run_comd_nvme_cr.sh $STORAGE_NODE_CNT weak
 sbatch                                                         \
     -N $TOTAL_NODE_CNT                                         \
-    -p $PARTITION                                             \
+    -p $PARTITION                                              \
     -C "[sky-gpu*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
     run_comd_nvme_cr.sh $STORAGE_NODE_CNT strong
 
 # POSIX runs
 sbatch                                                         \
     -N $COMPUTE_NODE_CNT                                       \
-    -p $PARTITION                                             \
+    -p $PARTITION                                              \
     -C "bdw-gpu*$COMPUTE_NODE_CNT"                             \
     run_comd_posix.sh weak
 sbatch                                                         \
     -N $COMPUTE_NODE_CNT                                       \
-    -p $PARTITION                                             \
+    -p $PARTITION                                              \
     -C "bdw-gpu*$COMPUTE_NODE_CNT"                             \
     run_comd_posix.sh strong
