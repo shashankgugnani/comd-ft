@@ -13,6 +13,11 @@
 ### Broadwell gpu nodes are used as compute and storage
 ### nodes.
 
+# Configuration parameters
+PARTITION=system-runs # Slurm partition to run on
+SC=sky-gpu # Storage node Slurm constraint
+CC=bdw-gpu # Compute node Slurm constraint
+
 COMPUTE_NODE_CNT=$1
 STORAGE_NODE_CNT=$2
 
@@ -30,23 +35,23 @@ TOTAL_NODE_CNT=$(( $COMPUTE_NODE_CNT + $STORAGE_NODE_CNT ))
 # NVMe-CR runs
 sbatch                                                         \
     -N $TOTAL_NODE_CNT                                         \
-    -p system-runs                                             \
+    -p $PARTITION                                             \
     -C "[sky-gpu*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
     run_comd_nvme_cr.sh $STORAGE_NODE_CNT weak
 sbatch                                                         \
     -N $TOTAL_NODE_CNT                                         \
-    -p system-runs                                             \
+    -p $PARTITION                                             \
     -C "[sky-gpu*$STORAGE_NODE_CNT&bdw-gpu*$COMPUTE_NODE_CNT]" \
     run_comd_nvme_cr.sh $STORAGE_NODE_CNT strong
 
 # POSIX runs
 sbatch                                                         \
     -N $COMPUTE_NODE_CNT                                       \
-    -p system-runs                                             \
+    -p $PARTITION                                             \
     -C "bdw-gpu*$COMPUTE_NODE_CNT"                             \
     run_comd_posix.sh weak
 sbatch                                                         \
     -N $COMPUTE_NODE_CNT                                       \
-    -p system-runs                                             \
+    -p $PARTITION                                             \
     -C "bdw-gpu*$COMPUTE_NODE_CNT"                             \
     run_comd_posix.sh strong

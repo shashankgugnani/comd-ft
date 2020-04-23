@@ -21,6 +21,9 @@
 /* peak system I/O bandwidth in GB/s */
 #define PEAK_BW            10000
 
+/* peak recovery I/O bandwidth in GB/s */
+#define PEAK_REC_BW        10000
+
 /* mean time between failure (mtbf) per node in years */
 /* A reasonable failure rate is ~1 failure per node per year. */
 /* This translates to an MTBF per node of ~1 year. */
@@ -29,11 +32,11 @@
 /* available memory per node in GB */
 #define MEM_PER_NODE       2432
 
+/* fraction of system memory to checkpoint */
+#define MEM_CHKPT_FRAC     0.20
+
 /* checkpoint size per node in GB */
 #define CHKPT_SZ_PER_NODE  (MEM_CHKPT_FRAC * MEM_PER_NODE)
-
-/* total # nodes in system */
-#define SYSTEM_SIZE        12655
 
 /**
  * Exascale prediction:
@@ -84,62 +87,76 @@ int main(int argc, char **argv) {
 	/* # nodes */
 	double num_nodes;
 
+        /* checkpoint bw (in GB/s) */
+        double chkpt_bw;
+
+        /* checkpoint efficiency */
+        double chkpt_eff;
+
+        /* recovery bw (in GB/s) */
+        double rec_bw;
+
+        /* recovery efficiency */
+        double rec_eff;
+
 	double num, den;
 
-	int i;
-
-        if (argc < 2) {
-            printf("Usage: %s <frac of sys mem to chkpt>\n", argv[0]);
+        if (argc < 6) {
+            printf("Usage: %s <num nodes> <chkpt bw> <chkpt efficiency> "
+                   "<recovery bw> <recovery efficiency>\n", argv[0]);
             return 1;
         }
 
-        /* get fraction of system memory to checkpoint */
-        double MEM_CHKPT_FRAC = atof(argv[1]);
+        /* get # nodes */
+        num_nodes = atoi(argv[1]);
 
-	printf("# nodes\t\tprogress rate\n");
-	printf("-----------------------------\n");
+        /* get checkpoint bw */
+        chkpt_bw = atof(argv[2]);
 
-	for (i = 1; i <= SYSTEM_SIZE; i += STEP) {
-		/* 'i' is # nodes */
-		num_nodes = i;
+        /* get checkpoint efficiency */
+        chkpt_eff = atof(argv[3]);
 
-		/* convert from years to seconds and divide by # nodes */
-		mtbf = MTBF_PER_NODE * 365 * 24 * 60 * 60 / num_nodes;
+        /* get recovery bw */
+        rec_bw = atof(argv[4]);
 
-		/* this is a simple calculation */
-		chkpt_size = CHKPT_SZ_PER_NODE * num_nodes;
-		delta = chkpt_size / PEAK_BW;
+        /* get recovery efficiency */
+        rec_eff = atof(argv[5]);
 
-		/* by definition */
-		DELTA = sqrt(2 * delta / mtbf);
+        /* convert from years to seconds and divide by # nodes */
+        mtbf = MTBF_PER_NODE * 365 * 24 * 60 * 60 / num_nodes;
 
-		if (DEBUG)
-			printf("mtbf=%f, delta=%f, DELTA=%f\n",
-			       mtbf, delta, DELTA);
+        /* this is a simple calculation */
+        chkpt_size = CHKPT_SZ_PER_NODE * num_nodes;
+        delta = chkpt_size / (chkpt_bw * chkpt_eff);
 
-		/* estimate lambda using [2] */
-		if (delta >= 2 * mtbf) {
-			lambda = 1;
-		} else {
-			lambda = DELTA + (square(DELTA) / 6) +
-				 (cube(DELTA) / 36);
-		}
-		num = lambda - (square(DELTA) / 2);
-		den = exp(lambda) - 1;
+        /* by definition */
+        DELTA = sqrt(2 * delta / mtbf);
 
-		/* calculate estimated recovery time */
-		/* NOTE: Here we use the assumption that recovery time is */
-		/* equal to chkpt time. */
-		rec_time = delta;
+        if (DEBUG)
+                printf("mtbf=%f, delta=%f, DELTA=%f\n",
+                       mtbf, delta, DELTA);
 
-		/* estimate progress rate using [1] */
-		progress_rate = exp(-rec_time / mtbf) * (num / den);
+        /* estimate lambda using [2] */
+        if (delta >= 2 * mtbf) {
+                lambda = 1;
+        } else {
+                lambda = DELTA + (square(DELTA) / 6) +
+                         (cube(DELTA) / 36);
+        }
+        num = lambda - (square(DELTA) / 2);
+        den = exp(lambda) - 1;
 
-		/* print estimated progress rate */
-		printf("%d\t\t%f\n", i, progress_rate);
+        /* calculate estimated recovery time */
+        /* NOTE: Here we use the assumption that recovery time is */
+        /* equal to chkpt time. */
+        rec_time = chkpt_size / (rec_bw * rec_eff);
 
-		if (i == 1) i = STEP;
-	}
+        /* estimate progress rate using [1] */
+        progress_rate = exp(-rec_time / mtbf) * (num / den);
+        progress_rate = progress_rate < 0 ? 0 : progress_rate;
+
+        /* print estimated progress rate */
+        printf("%f\n", progress_rate);
 
 	return 0;
 }
